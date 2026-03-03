@@ -26,45 +26,23 @@ export class Registro {
   ) {
     this.form = this.fb.group(
       {
-        name: ['', [Validators.required, Validators.pattern(/^[A-Za-zÁÉÍÓÚáéíóúÑñ\s]+$/) ]],
-        email: ['', [Validators.required, Validators.email, this.validators.institutionalEmailNoAdmin()]],
+        name: ['', [
+          Validators.required,
+          this.validators.validName() // Nuevo validador para nombre
+        ]],
+        email: ['', [
+          Validators.required, 
+          this.validators.institutionalEmailNoAdmin()
+        ]],
         role: ['student' as Role, [Validators.required]],
-        password: ['', [Validators.required, this.validators.minLengthTrim(6)]],
+        password: ['', [
+          Validators.required,
+          this.validators.strongPassword() // Nuevo validador para contraseña
+        ]],
         confirmPassword: ['', [Validators.required]],
       },
       { validators: [this.validators.matchFields('password', 'confirmPassword')] }
     );
-  }
-
-  sanitizeName() {
-    const control = this.form.get('name');
-    if (!control) return;
-
-    const value = (control.value || '') as string;
-
-    // restringir datos
-    const cleaned = value
-      .replace(/[^A-Za-zÁÉÍÓÚáéíóúÑñ\s]/g, '')
-      .replace(/\s+/g, ' ')
-      .trimStart();
-
-    if (cleaned !== value) {
-      control.setValue(cleaned, { emitEvent: false });
-    }
-  }
-  sanitizeEmail() {
-    const control = this.form.get('email');
-    if (!control) return;
-
-    const value = (control.value || '') as string;
-
-    const cleaned = value
-      .replace(/\s/g, '')
-      .toLowerCase();
-
-    if (cleaned !== value) {
-      control.setValue(cleaned, { emitEvent: false });
-    }
   }
 
   get name() { return this.form.get('name'); }
@@ -72,6 +50,31 @@ export class Registro {
   get role() { return this.form.get('role'); }
   get password() { return this.form.get('password'); }
   get confirmPassword() { return this.form.get('confirmPassword'); }
+
+  // Método auxiliar para obtener mensajes de error específicos de contraseña
+  getPasswordErrors(): string[] {
+    const errors: string[] = [];
+    const passwordControl = this.password;
+    
+    if (passwordControl?.touched && passwordControl?.errors) {
+      if (passwordControl.errors['required']) {
+        errors.push('La contraseña es requerida');
+      }
+      if (passwordControl.errors['weakPassword']) {
+        const weakErrors = passwordControl.errors['weakPassword'];
+        if (weakErrors['minLength']) {
+          errors.push(`La contraseña debe tener al menos ${weakErrors['minLength'].required} caracteres`);
+        }
+        if (weakErrors['missingUppercase']) {
+          errors.push('Debe contener al menos una letra mayúscula');
+        }
+        if (weakErrors['missingNumber']) {
+          errors.push('Debe contener al menos un número');
+        }
+      }
+    }
+    return errors;
+  }
 
   submit() {
     if (this.form.invalid) {

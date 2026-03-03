@@ -3,7 +3,7 @@
 
     <a class="brand" routerLink="/">
       <img class="brand__logo" src="assets/images/logo_buap.png" alt="BUAP Logo" />
-      <span class="brand__name">CampusForum</span>
+      <span class="brand__name">CampusFoooorum</span>
     </a>
 
     <div class="card">
@@ -20,11 +20,18 @@
 
           <mat-form-field appearance="fill" class="full field__control">
             <mat-icon matPrefix>person</mat-icon>
-            <input matInput type="text" placeholder="Juan Hernandez" formControlName="name" (input)="sanitizeName()"/>
-            <mat-error *ngIf="name?.touched && name?.hasError('required')">
-              El nombre es requerido
-            </mat-error>
+            <input matInput type="text" placeholder="Juan Hernandez" formControlName="name" />
           </mat-form-field>
+          
+          <!-- Mensajes de error personalizados para nombre -->
+          <div class="error-messages" *ngIf="name?.touched && name?.invalid">
+            <div class="error-item" *ngIf="name?.hasError('required')">
+              El nombre es requerido
+            </div>
+            <div class="error-item" *ngIf="name?.hasError('invalidName')">
+              Solo se permiten letras y espacios
+            </div>
+          </div>
         </div>
 
         <!-- Email -->
@@ -33,15 +40,18 @@
 
           <mat-form-field appearance="fill" class="full field__control">
             <mat-icon matPrefix>mail</mat-icon>
-            <input matInput type="email" placeholder="ejemplo@alumno.buap.mx" formControlName="email" (input)="sanitizeEmail()"/>
-
-            <mat-error *ngIf="email?.touched && email?.hasError('required')">
-              El correo es requerido
-            </mat-error>
-            <mat-error *ngIf="email?.touched && email?.hasError('institutionalEmailNoAdmin')">
-              Debe usar un correo institucional (@alumno.buap.mx o @buap.mx)
-            </mat-error>
+            <input matInput type="email" placeholder="ejemplo@alumno.buap.mx" formControlName="email" />
           </mat-form-field>
+          
+          <!-- Mensajes de error personalizados para email -->
+          <div class="error-messages" *ngIf="email?.touched && email?.invalid">
+            <div class="error-item" *ngIf="email?.hasError('required')">
+              El correo es requerido
+            </div>
+            <div class="error-item" *ngIf="email?.hasError('institutionalEmailNoAdmin')">
+              Debe usar un correo institucional (@alumno.buap.mx o @buap.mx)
+            </div>
+          </div>
         </div>
 
         <!-- Radio -->
@@ -61,14 +71,25 @@
           <mat-form-field appearance="fill" class="full field__control">
             <mat-icon matPrefix>lock</mat-icon>
             <input matInput type="password" placeholder="••••••••" formControlName="password" />
-
-            <mat-error *ngIf="password?.touched && password?.hasError('required')">
-              La contraseña es requerida
-            </mat-error>
-            <mat-error *ngIf="password?.touched && password?.hasError('minLengthTrim')">
-              La contraseña debe tener al menos 6 caracteres
-            </mat-error>
           </mat-form-field>
+          
+          <!-- Mensajes de error personalizados para contraseña -->
+          <div class="error-messages" *ngIf="password?.touched && password?.invalid">
+            <div class="error-item" *ngIf="password?.hasError('required')">
+              La contraseña es requerida
+            </div>
+            <div class="error-item" *ngIf="password?.hasError('weakPassword')">
+              <div *ngIf="password?.errors?.['weakPassword']?.minLength">
+                • Mínimo 8 caracteres
+              </div>
+              <div *ngIf="password?.errors?.['weakPassword']?.missingUppercase">
+                • Debe tener al menos una mayúscula
+              </div>
+              <div *ngIf="password?.errors?.['weakPassword']?.missingNumber">
+                • Debe tener al menos un número
+              </div>
+            </div>
+          </div>
         </div>
 
         <!-- Confirm -->
@@ -78,14 +99,17 @@
           <mat-form-field appearance="fill" class="full field__control">
             <mat-icon matPrefix>lock</mat-icon>
             <input matInput type="password" placeholder="••••••••" formControlName="confirmPassword" />
-
-            <mat-error *ngIf="confirmPassword?.touched && confirmPassword?.hasError('required')">
-              Confirma tu contraseña
-            </mat-error>
-            <mat-error *ngIf="confirmPassword?.touched && confirmPassword?.hasError('fieldsMismatch')">
-              Las contraseñas no coinciden
-            </mat-error>
           </mat-form-field>
+          
+          <!-- Mensajes de error personalizados para confirmar contraseña -->
+          <div class="error-messages" *ngIf="confirmPassword?.touched && confirmPassword?.invalid">
+            <div class="error-item" *ngIf="confirmPassword?.hasError('required')">
+              Confirma tu contraseña
+            </div>
+            <div class="error-item" *ngIf="confirmPassword?.hasError('fieldsMismatch')">
+              Las contraseñas no coinciden
+            </div>
+          </div>
         </div>
 
         <button
@@ -93,7 +117,7 @@
           color="primary"
           class="action-btn"
           type="submit"
-          [disabled]="submitting"
+          [disabled]="submitting || form.invalid"
         >
           {{ submitting ? 'Creando…' : 'Crear Cuenta' }}
         </button>

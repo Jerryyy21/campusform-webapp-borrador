@@ -12,6 +12,12 @@ export class ValidatorServices {
   private readonly institutionalEmailNoAdminRegex =
     /^[^\s@]+@(alumno\.buap\.mx|buap\.mx)$/i;
 
+  // Regex para nombre: solo letras y espacios
+  private readonly nameRegex = /^[a-zA-ZáéíóúÁÉÍÓÚñÑ\s]+$/;
+
+  // Regex para contraseña: mínimo 8 caracteres, al menos una mayúscula y un número
+  private readonly passwordRegex = /^(?=.*[A-Z])(?=.*\d).{8,}$/;
+
   institutionalEmail(): ValidatorFn {
     return (control: AbstractControl): ValidationErrors | null => {
       const value = (control.value ?? '').toString().trim();
@@ -29,6 +35,40 @@ export class ValidatorServices {
       return this.institutionalEmailNoAdminRegex.test(value)
         ? null
         : { institutionalEmailNoAdmin: true };
+    };
+  }
+
+  // Nuevo validador para nombre (solo letras y espacios)
+  validName(): ValidatorFn {
+    return (control: AbstractControl): ValidationErrors | null => {
+      const value = (control.value ?? '').toString().trim();
+      if (!value) return null;
+      
+      const isValid = this.nameRegex.test(value);
+      return isValid ? null : { invalidName: true };
+    };
+  }
+
+  // Nuevo validador para contraseña fuerte
+  strongPassword(): ValidatorFn {
+    return (control: AbstractControl): ValidationErrors | null => {
+      const value = (control.value ?? '').toString();
+      if (!value) return null;
+      
+      const hasUpperCase = /[A-Z]/.test(value);
+      const hasNumber = /\d/.test(value);
+      const hasMinLength = value.length >= 8;
+      
+      if (hasMinLength && hasUpperCase && hasNumber) {
+        return null;
+      }
+      
+      const errors: any = {};
+      if (!hasMinLength) errors['minLength'] = { required: 8, actual: value.length };
+      if (!hasUpperCase) errors['missingUppercase'] = true;
+      if (!hasNumber) errors['missingNumber'] = true;
+      
+      return { weakPassword: errors };
     };
   }
 
