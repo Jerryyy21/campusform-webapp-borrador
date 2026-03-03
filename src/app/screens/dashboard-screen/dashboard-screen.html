@@ -1,6 +1,11 @@
 <div class="dashboard-root landing-root">
   <!-- TOPBAR -->
   <mat-toolbar class="navbar-glass sticky-top border-bottom">
+    <!-- Botón hamburguesa (solo móvil) -->
+    <button mat-icon-button class="hide-desktop" (click)="toggleSidenav()">
+      <mat-icon>menu</mat-icon>
+    </button>
+
     <div class="brand-icon">
       <mat-icon>school</mat-icon>
     </div>
@@ -25,112 +30,137 @@
     </button>
   </mat-toolbar>
 
-  <mat-sidenav-container class="container" style="min-height: calc(100vh - 64px);">
+  <!-- LAYOUT -->
+  <mat-sidenav-container class="container">
     <!-- SIDEBAR -->
-    <mat-sidenav mode="side" opened class="sidebar" style="width: 280px;">
-      <button mat-button class="nav-btn"
+    <mat-sidenav
+      #sidenav
+      class="sidebar"
+      [mode]="isMobile ? 'over' : 'side'"
+      [opened]="!isMobile"
+    >
+      <button
+        mat-button
+        class="nav-btn"
         [class.active]="activeSection === 'Inicio'"
-        (click)="setSection('Inicio')">
+        (click)="setSection('Inicio')"
+      >
         <mat-icon>home</mat-icon>
         Inicio
       </button>
 
-      <button mat-button class="nav-btn"
+      <button
+        mat-button
+        class="nav-btn"
         [class.active]="activeSection === 'Mis Posts'"
-        (click)="setSection('Mis Posts')">
+        (click)="setSection('Mis Posts')"
+      >
         <mat-icon>chat</mat-icon>
         Mis Posts
       </button>
 
-      <button mat-button class="nav-btn"
+      <button
+        mat-button
+        class="nav-btn"
         [class.active]="activeSection === 'Populares'"
-        (click)="setSection('Populares')">
+        (click)="setSection('Populares')"
+      >
         <mat-icon>trending_up</mat-icon>
         Populares
       </button>
 
-      <button mat-button class="nav-btn"
+      <button
+        mat-button
+        class="nav-btn"
         [class.active]="activeSection === 'Guardados'"
-        (click)="setSection('Guardados')">
+        (click)="setSection('Guardados')"
+      >
         <mat-icon>bookmark</mat-icon>
         Guardados
       </button>
 
       <!-- CATEGORÍAS -->
-      <div style="margin-top: 24px; padding: 0 12px;">
-        <div style="font-weight:800; color:#6c757d; letter-spacing:.06em; font-size:12px; margin: 10px 0;">
-          CATEGORÍAS
-        </div>
+      <div class="sidebar-cats">
+        <div class="sidebar-cats-title">CATEGORÍAS</div>
 
-        <button mat-button class="nav-btn"
+        <button
+          mat-button
+          class="nav-btn"
           [class.active]="activeCategory === 'Todas'"
-          (click)="setCategory('Todas')">
+          (click)="setCategory('Todas')"
+        >
           Todas
         </button>
 
-        <button mat-button class="nav-btn"
+        <button
+          mat-button
+          class="nav-btn"
           [class.active]="activeCategory === 'Matemáticas'"
-          (click)="setCategory('Matemáticas')">
+          (click)="setCategory('Matemáticas')"
+        >
           Matemáticas
         </button>
 
-        <button mat-button class="nav-btn"
+        <button
+          mat-button
+          class="nav-btn"
           [class.active]="activeCategory === 'Programación'"
-          (click)="setCategory('Programación')">
+          (click)="setCategory('Programación')"
+        >
           Programación
         </button>
 
-        <button mat-button class="nav-btn"
+        <button
+          mat-button
+          class="nav-btn"
           [class.active]="activeCategory === 'Física'"
-          (click)="setCategory('Física')">
+          (click)="setCategory('Física')"
+        >
           Física
         </button>
 
-        <button mat-button class="nav-btn"
+        <button
+          mat-button
+          class="nav-btn"
           [class.active]="activeCategory === 'Campus'"
-          (click)="setCategory('Campus')">
+          (click)="setCategory('Campus')"
+        >
           Campus
         </button>
       </div>
     </mat-sidenav>
 
     <!-- CONTENT -->
-    <mat-sidenav-content class="content" style="padding: 28px;">
-      <div style="max-width: 1100px; margin: 0 auto;">
-
+    <mat-sidenav-content class="content">
+      <div class="page-wrap">
         <!-- BREADCRUMB -->
-        <div style="color:#6c757d; font-size: 16px; margin-bottom: 18px;">
-          Inicio <span class="dot">›</span> Dashboard <span class="dot">›</span> {{ activeCategory || 'Todas' }}
+        <div class="breadcrumb">
+          Inicio <span class="dot">›</span> Dashboard <span class="dot">›</span>
+          {{ activeCategory || 'Todas' }}
         </div>
 
         <!-- HEADER -->
-        <div class="content-header"
-             style="display:flex; align-items:center; justify-content:space-between; gap:16px; margin-bottom: 18px;">
-          <div>
-            <h1 class="section-title" style="font-size: 44px; margin: 0;">
-              Feed de Publicaciones
-            </h1>
-            <p class="section-subtitle" style="margin: 6px 0 0;">
-              0 publicaciones encontradas
-            </p>
+        <div class="content-header">
+          <div class="content-title">
+            <h1 class="section-title">Feed de Publicaciones</h1>
+            <p class="section-subtitle">0 publicaciones encontradas</p>
           </div>
 
-          <button mat-flat-button color="primary" style="border-radius: 14px; padding: 10px 18px;">
-            <mat-icon style="margin-right:8px;">add</mat-icon>
-            Nueva Publicación
+          <button mat-flat-button color="primary" class="new-post-btn" (click)="openNewPostModal()">
+            Nueva publicación
           </button>
         </div>
 
         <!-- SEARCH + ORDER -->
-        <div class="glass-card" style="padding: 18px; margin-bottom: 18px;">
-          <div style="display:flex; gap:16px; align-items:center; flex-wrap:wrap;">
-            <mat-form-field appearance="outline" style="flex: 1 1 520px;">
+        <div class="glass-card search-card">
+          <div class="search-row">
+            <mat-form-field appearance="outline" class="search-field">
               <mat-label>Buscar publicaciones...</mat-label>
               <mat-icon matPrefix>search</mat-icon>
-              <input matInput [(ngModel)]="searchQuery">
+              <input matInput [(ngModel)]="searchQuery" />
             </mat-form-field>
 
-            <mat-form-field appearance="outline" style="width: 240px;">
+            <mat-form-field appearance="outline" class="sort-field">
               <mat-label>Ordenar por</mat-label>
               <mat-select [(ngModel)]="sortBy">
                 <mat-option value="recent">Más recientes</mat-option>
@@ -142,15 +172,11 @@
         </div>
 
         <!-- POSTS (VACÍO POR AHORA) -->
-        <div class="glass-card empty-state" style="padding: 28px; text-align:center;">
+        <div class="glass-card empty-state empty-card">
           <div class="empty-icon">🗂️</div>
-          <h3 style="margin: 10px 0 6px; font-weight: 900; color:#0b2f5b;">
-            Aún no hay publicaciones
-          </h3>
-          <p style="margin:0; color:#6c757d;">
-          </p>
+          <h3 class="empty-title">Aún no hay publicaciones</h3>
+          <p class="empty-text"></p>
         </div>
-
       </div>
     </mat-sidenav-content>
   </mat-sidenav-container>

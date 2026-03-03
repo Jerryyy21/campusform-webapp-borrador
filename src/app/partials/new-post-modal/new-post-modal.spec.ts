@@ -1,18 +1,18 @@
 import { ComponentFixture, TestBed } from '@angular/core/testing';
 
-import { DashboardScreen } from './dashboard-screen';
+import { NewPostModal } from './new-post-modal';
 
-describe('DashboardScreen', () => {
-  let component: DashboardScreen;
-  let fixture: ComponentFixture<DashboardScreen>;
+describe('NewPostModal', () => {
+  let component: NewPostModal;
+  let fixture: ComponentFixture<NewPostModal>;
 
   beforeEach(async () => {
     await TestBed.configureTestingModule({
-      imports: [DashboardScreen]
+      imports: [NewPostModal]
     })
     .compileComponents();
 
-    fixture = TestBed.createComponent(DashboardScreen);
+    fixture = TestBed.createComponent(NewPostModal);
     component = fixture.componentInstance;
     fixture.detectChanges();
   });

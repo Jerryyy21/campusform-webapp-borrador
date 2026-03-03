@@ -8,6 +8,9 @@ import {MatDividerModule} from '@angular/material/divider';
 import {MatIconModule} from '@angular/material/icon';
 import {MatRadioButton } from '@angular/material/radio';
 import { MatRadioModule } from '@angular/material/radio';
+import { MatToolbarModule } from '@angular/material/toolbar';
+import { MatSidenavModule } from '@angular/material/sidenav'; // si usas mat-sidenav-container
+
 
 /* Formularios */
 import { MatFormFieldModule } from '@angular/material/form-field';
@@ -45,6 +48,8 @@ export const SHARED_IMPORTS = [
   MatRadioButton,
   ReactiveFormsModule,
   MatRadioModule,
+  MatToolbarModule,
+  MatSidenavModule,
 
   /* Third-party */
   NgxMaskDirective,
