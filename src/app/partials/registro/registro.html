@@ -3,7 +3,7 @@
 
     <a class="brand" routerLink="/">
       <img class="brand__logo" src="assets/images/logo_buap.png" alt="BUAP Logo" />
-      <span class="brand__name">CampusFoooorum</span>
+      <span class="brand__name">CampusForum</span>
     </a>
 
     <div class="card">
@@ -20,7 +20,7 @@
 
           <mat-form-field appearance="fill" class="full field__control">
             <mat-icon matPrefix>person</mat-icon>
-            <input matInput type="text" placeholder="Juan Hernandez" formControlName="name" />
+            <input matInput type="text" placeholder="Juan Hernandez" formControlName="name" (input)="sanitizeName()"/>
             <mat-error *ngIf="name?.touched && name?.hasError('required')">
               El nombre es requerido
             </mat-error>
@@ -33,7 +33,7 @@
 
           <mat-form-field appearance="fill" class="full field__control">
             <mat-icon matPrefix>mail</mat-icon>
-            <input matInput type="email" placeholder="ejemplo@alumno.buap.mx" formControlName="email" />
+            <input matInput type="email" placeholder="ejemplo@alumno.buap.mx" formControlName="email" (input)="sanitizeEmail()"/>
 
             <mat-error *ngIf="email?.touched && email?.hasError('required')">
               El correo es requerido

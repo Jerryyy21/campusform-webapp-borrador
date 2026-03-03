@@ -26,14 +26,45 @@ export class Registro {
   ) {
     this.form = this.fb.group(
       {
-        name: ['', [Validators.required]],
-        email: ['', [Validators.required, this.validators.institutionalEmailNoAdmin()]],
+        name: ['', [Validators.required, Validators.pattern(/^[A-Za-zÁÉÍÓÚáéíóúÑñ\s]+$/) ]],
+        email: ['', [Validators.required, Validators.email, this.validators.institutionalEmailNoAdmin()]],
         role: ['student' as Role, [Validators.required]],
         password: ['', [Validators.required, this.validators.minLengthTrim(6)]],
         confirmPassword: ['', [Validators.required]],
       },
       { validators: [this.validators.matchFields('password', 'confirmPassword')] }
     );
+  }
+
+  sanitizeName() {
+    const control = this.form.get('name');
+    if (!control) return;
+
+    const value = (control.value || '') as string;
+
+    // restringir datos
+    const cleaned = value
+      .replace(/[^A-Za-zÁÉÍÓÚáéíóúÑñ\s]/g, '')
+      .replace(/\s+/g, ' ')
+      .trimStart();
+
+    if (cleaned !== value) {
+      control.setValue(cleaned, { emitEvent: false });
+    }
+  }
+  sanitizeEmail() {
+    const control = this.form.get('email');
+    if (!control) return;
+
+    const value = (control.value || '') as string;
+
+    const cleaned = value
+      .replace(/\s/g, '')
+      .toLowerCase();
+
+    if (cleaned !== value) {
+      control.setValue(cleaned, { emitEvent: false });
+    }
   }
 
   get name() { return this.form.get('name'); }
