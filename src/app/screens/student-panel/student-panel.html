@@ -1,0 +1,235 @@
+<div class="panel-root">
+
+    <nav class="navbar navbar-expand-lg fixed-top navbar-glass">
+        <div class="container-fluid">
+            <a class="navbar-brand" href="#">
+                <span class="brand-icon">
+                    <i class="bi bi-mortarboard-fill"></i>
+                </span>
+                CampusForum
+            </a>
+
+            <div class="nav-actions ms-auto">
+                <div class="badge-role">
+                    <i class="bi bi-person-circle"></i>
+                    Alumno
+                </div>
+                <button class="btn btn-dashboard d-none d-sm-block" routerLink="/dashboard">Dashboard</button>
+                <button class="btn btn-icon"><i class="bi bi-gear"></i></button>
+                <button class="btn btn-icon"><i class="bi bi-box-arrow-right"></i></button>
+            </div>
+        </div>
+    </nav>
+
+    <div class="container main-content">
+        <h1>Panel de Alumno</h1>
+        <p class="subtitle">Gestiona tus publicaciones, comentarios y reportes</p>
+
+
+        <div class="nav-pills-glass">
+            <button class="nav-link" [class.active]="activeTab === 'posts'" (click)="setActiveTab('posts')">
+                Mis Posts <span class="badge bg-primary rounded-pill">{{ myPosts.length }}</span>
+            </button>
+            <button class="nav-link" [class.active]="activeTab === 'comments'" (click)="setActiveTab('comments')">
+                Comentarios <span class="badge bg-primary rounded-pill">{{ myComments.length }}</span>
+            </button>
+            <button class="nav-link" [class.active]="activeTab === 'reports'" (click)="setActiveTab('reports')">
+                Mis Reportes <span class="badge bg-warning text-dark rounded-pill">{{ myReports.length }}</span>
+            </button>
+        </div>
+
+
+        <div class="glass-card">
+
+
+            @if (activeTab === 'posts') {
+            <div class="section-header">
+                <h3>Mis Publicaciones</h3>
+                <button class="btn btn-primary d-flex align-items-center gap-2" (click)="openNewPostModal()">
+                    <i class="bi bi-plus-lg"></i> Nuevo Post
+                </button>
+            </div>
+
+            @if (myPosts.length === 0) {
+            <div class="empty-state">
+                <i class="bi bi-chat-square-text"></i>
+                <p>Aún no tienes publicaciones</p>
+                <button class="btn btn-primary mt-2" (click)="openNewPostModal()">
+                    <i class="bi bi-plus-lg me-1"></i> Crear mi primer post
+                </button>
+            </div>
+            } @else {
+            <!-- List of posts would go here -->
+            }
+            }
+
+
+            @if (activeTab === 'comments') {
+            <div class="section-header">
+                <h3>Mis Comentarios</h3>
+            </div>
+
+            <div class="comment-list">
+                @for (comment of myComments; track comment.id) {
+                <div class="item-card">
+                    <div class="d-flex justify-content-between align-items-start">
+                        <div>
+                            <div class="item-title">
+                                <i class="bi bi-chat-left-text"></i>
+                                {{ comment.postTitle }}
+                            </div>
+                            <p class="text-secondary mb-2">{{ comment.content }}</p>
+                            <div class="item-meta">
+                                <i class="bi bi-calendar3"></i> {{ comment.timeAgo }}
+                            </div>
+                        </div>
+                        <button class="btn btn-outline-secondary btn-sm">
+                            <i class="bi bi-eye"></i> Ver Post
+                        </button>
+                    </div>
+                </div>
+                }
+            </div>
+            }
+
+
+            @if (activeTab === 'reports') {
+            <div class="section-header">
+                <h3>Mis Reportes</h3>
+                <button class="btn btn-primary d-flex align-items-center gap-2" (click)="openNewReportModal()">
+                    <i class="bi bi-flag"></i> Nuevo Reporte
+                </button>
+            </div>
+
+            <div class="report-list">
+                @for (report of myReports; track report.id) {
+                <div class="item-card">
+                    <div class="mb-3 d-flex align-items-center">
+                        <span class="badge border text-dark me-2">{{ report.type }}</span>
+                        <span class="badge-status">{{ report.status }}</span>
+                    </div>
+                    <h5 class="fw-bold mb-1" style="color: #1e293b;">{{ report.title }}</h5>
+                    <div class="text-muted small mb-2">Razón: {{ report.reason }}</div>
+                    <p class="text-secondary mb-3">{{ report.description }}</p>
+                    <div class="item-meta">
+                        <i class="bi bi-calendar3"></i> {{ report.timeAgo }}
+                    </div>
+                </div>
+                }
+            </div>
+            }
+
+        </div>
+    </div>
+
+    <!-- Modal Crear Nueva Publicación -->
+    @if (showNewPostModal) {
+    <div class="modal-overlay" (click)="closeNewPostModal()">
+        <div class="modal-card" (click)="$event.stopPropagation()">
+            <div class="modal-header-custom">
+                <div>
+                    <h3>Crear Nueva Publicación</h3>
+                    <p class="modal-subtitle">Comparte tus conocimientos o haz preguntas a la comunidad</p>
+                </div>
+                <button class="btn-close-modal" (click)="closeNewPostModal()">
+                    <i class="bi bi-x-lg"></i>
+                </button>
+            </div>
+
+            <div class="modal-body-custom">
+                <div class="form-group-custom">
+                    <label>Título <span class="required">*</span></label>
+                    <input type="text" class="form-input-custom" placeholder="Escribe un título descriptivo"
+                        [(ngModel)]="newPost.title">
+                </div>
+
+                <div class="form-group-custom">
+                    <label>Categoría <span class="required">*</span></label>
+                    <select class="form-input-custom form-select-custom" [(ngModel)]="newPost.category">
+                        <option value="" disabled selected>Selecciona una categoría</option>
+                        @for (cat of categories; track cat) {
+                        <option [value]="cat">{{ cat }}</option>
+                        }
+                    </select>
+                </div>
+
+                <div class="form-group-custom">
+                    <label>Contenido <span class="required">*</span></label>
+                    <textarea class="form-input-custom form-textarea"
+                        placeholder="Describe tu pregunta o tema en detalle..."
+                        [(ngModel)]="newPost.content"></textarea>
+                </div>
+
+                <div class="form-group-custom">
+                    <label>Etiquetas (separadas por comas)</label>
+                    <input type="text" class="form-input-custom" placeholder="Ej: ayuda, examen, proyecto"
+                        [(ngModel)]="newPost.tags">
+                </div>
+            </div>
+
+            <div class="modal-footer-custom">
+                <button class="btn btn-cancel" (click)="closeNewPostModal()">Cancelar</button>
+                <button class="btn btn-publish" (click)="publishPost()">Publicar</button>
+            </div>
+        </div>
+    </div>
+    }
+
+    <!-- Modal Reportar Contenido Inapropiado -->
+    @if (showNewReportModal) {
+    <div class="modal-overlay" (click)="closeNewReportModal()">
+        <div class="modal-card" (click)="$event.stopPropagation()">
+            <div class="modal-header-custom">
+                <div>
+                    <h3>Reportar Contenido Inapropiado</h3>
+                    <p class="modal-subtitle">Ayúdanos a mantener la comunidad segura reportando contenido que viole las
+                        normas</p>
+                </div>
+                <button class="btn-close-modal" (click)="closeNewReportModal()">
+                    <i class="bi bi-x-lg"></i>
+                </button>
+            </div>
+
+            <div class="modal-body-custom">
+                <div class="form-group-custom">
+                    <label>Tipo de contenido <span class="required">*</span></label>
+                    <select class="form-input-custom form-select-custom" [(ngModel)]="newReport.contentType">
+                        <option value="" disabled selected>Selecciona un tipo</option>
+                        @for (type of contentTypes; track type) {
+                        <option [value]="type">{{ type }}</option>
+                        }
+                    </select>
+                </div>
+
+                <div class="form-group-custom">
+                    <label>Título del contenido <span class="required">*</span></label>
+                    <input type="text" class="form-input-custom" placeholder="Ej: Post sobre venta de productos"
+                        [(ngModel)]="newReport.contentTitle">
+                </div>
+
+                <div class="form-group-custom">
+                    <label>Razón del reporte <span class="required">*</span></label>
+                    <select class="form-input-custom form-select-custom" [(ngModel)]="newReport.reason">
+                        <option value="" disabled selected>Selecciona una razón</option>
+                        @for (reason of reportReasons; track reason) {
+                        <option [value]="reason">{{ reason }}</option>
+                        }
+                    </select>
+                </div>
+
+                <div class="form-group-custom">
+                    <label>Descripción detallada <span class="required">*</span></label>
+                    <textarea class="form-input-custom form-textarea"
+                        placeholder="Explica por qué estás reportando este contenido..."
+                        [(ngModel)]="newReport.description"></textarea>
+                </div>
+            </div>
+
+            <div class="modal-footer-custom">
+                <button class="btn btn-cancel" (click)="closeNewReportModal()">Cancelar</button>
+                <button class="btn btn-publish" (click)="submitReport()">Enviar Reporte</button>
+            </div>
+        </div>
+    </div>
+    }
+</div>
