@@ -1,6 +1,7 @@
 import { Injectable } from '@angular/core';
-import { HttpClient } from '@angular/common/http';
-import { Observable } from 'rxjs';
+import { HttpClient, HttpHeaders } from '@angular/common/http';
+import { Observable, throwError } from 'rxjs';
+import { catchError } from 'rxjs/operators';
 import { AuthService } from './auth.services';
 
 export interface Category {
@@ -23,6 +24,7 @@ export interface CreateCategoryPayload {
   providedIn: 'root'
 })
 export class CategoryService {
+  // ✅ TU BACKEND REAL ES /api/...
   private apiUrl = 'http://localhost:8000/api';
 
   constructor(
@@ -30,44 +32,99 @@ export class CategoryService {
     private auth: AuthService
   ) {}
 
-  private getHeaders() {
+  /** Helper para headers con token */
+  private authHeaders(): HttpHeaders {
     const token = this.auth.getToken();
-    console.log('Token enviado:', token ? 'Bearer ' + token.substring(0, 20) + '...' : 'No token');
-    
-    return {
-      'Authorization': `Bearer ${token}`,
-      'Content-Type': 'application/json'
-    };
+
+    let headers = new HttpHeaders({
+      'Content-Type': 'application/json',
+    });
+
+    if (token) {
+      headers = headers.set('Authorization', `Bearer ${token}`);
+    }
+
+    return headers;
   }
 
+  /** Obtiene todas las categorías - PÚBLICO */
   getCategories(): Observable<Category[]> {
-    const headers = this.getHeaders();
-    console.log('Headers:', headers);
-    
-    return this.http.get<Category[]>(`${this.apiUrl}/categorias/`, { headers });
+    const url = `${this.apiUrl}/categorias/`;
+    console.log('📡 GET categorías:', url);
+
+    return this.http.get<Category[]>(url).pipe(
+      catchError(error => {
+        console.error('❌ Error en getCategories:', error);
+        return throwError(() => error);
+      })
+    );
   }
 
+  /** Obtiene una categoría por ID - PÚBLICO */
   getCategory(id: number): Observable<Category> {
-    return this.http.get<Category>(`${this.apiUrl}/categorias/${id}/`, {
-      headers: this.getHeaders()
-    });
+    const url = `${this.apiUrl}/categorias/${id}/`;
+    console.log('📡 GET categoría:', url);
+
+    return this.http.get<Category>(url).pipe(
+      catchError(error => {
+        console.error('❌ Error en getCategory:', error);
+        return throwError(() => error);
+      })
+    );
   }
 
+  /** Crea una nueva categoría - REQUIERE TOKEN */
   createCategory(payload: CreateCategoryPayload): Observable<Category> {
-    return this.http.post<Category>(`${this.apiUrl}/categorias/`, payload, {
-      headers: this.getHeaders()
-    });
+    const url = `${this.apiUrl}/categorias/`;
+    console.log('📡 POST crear categoría:', url);
+
+    const token = this.auth.getToken();
+    if (!token) {
+      console.error('❌ No hay token en localStorage/sessionStorage');
+      return throwError(() => new Error('No hay token de autenticación'));
+    }
+
+    return this.http.post<Category>(url, payload, { headers: this.authHeaders() }).pipe(
+      catchError(error => {
+        console.error('❌ Error en createCategory:', error);
+        return throwError(() => error);
+      })
+    );
   }
 
+  /** Actualiza una categoría - REQUIERE TOKEN */
   updateCategory(id: number, payload: CreateCategoryPayload): Observable<Category> {
-    return this.http.put<Category>(`${this.apiUrl}/categorias/${id}/`, payload, {
-      headers: this.getHeaders()
-    });
+    const url = `${this.apiUrl}/categorias/${id}/`;
+    console.log('📡 PUT actualizar categoría:', url);
+
+    const token = this.auth.getToken();
+    if (!token) {
+      return throwError(() => new Error('No hay token de autenticación'));
+    }
+
+    return this.http.put<Category>(url, payload, { headers: this.authHeaders() }).pipe(
+      catchError(error => {
+        console.error('❌ Error en updateCategory:', error);
+        return throwError(() => error);
+      })
+    );
   }
 
+  /** Elimina una categoría - REQUIERE TOKEN */
   deleteCategory(id: number): Observable<void> {
-    return this.http.delete<void>(`${this.apiUrl}/categorias/${id}/`, {
-      headers: this.getHeaders()
-    });
+    const url = `${this.apiUrl}/categorias/${id}/`;
+    console.log('📡 DELETE eliminar categoría:', url);
+
+    const token = this.auth.getToken();
+    if (!token) {
+      return throwError(() => new Error('No hay token de autenticación'));
+    }
+
+    return this.http.delete<void>(url, { headers: this.authHeaders() }).pipe(
+      catchError(error => {
+        console.error('❌ Error en deleteCategory:', error);
+        return throwError(() => error);
+      })
+    );
   }
 }
