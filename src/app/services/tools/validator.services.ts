@@ -4,13 +4,17 @@ import { AbstractControl, ValidationErrors, ValidatorFn, FormGroup } from '@angu
 @Injectable({ providedIn: 'root' })
 export class ValidatorServices {
 
-  // Login: alumno | buap | admin
-  private readonly institutionalEmailRegex =
-    /^[^\s@]+@(alumno\.buap\.mx|buap\.mx|admin\.buap\.mx)$/i;
+  // Dominios específicos por rol
+  private readonly domains = {
+    student: '@alumno.buap.mx',
+    teacher: '@buap.mx',
+    admin: '@admin.buap.mx'
+  };
 
-  // Register: alumno | buap (SIN admin)
-  private readonly institutionalEmailNoAdminRegex =
-    /^[^\s@]+@(alumno\.buap\.mx|buap\.mx)$/i;
+  // Regex para cada tipo de usuario
+  private readonly studentEmailRegex = /^[^\s@]+@alumno\.buap\.mx$/i;
+  private readonly teacherEmailRegex = /^[^\s@]+@buap\.mx$/i;
+  private readonly adminEmailRegex = /^[^\s@]+@admin\.buap\.mx$/i;
 
   // Regex para nombre: solo letras y espacios
   private readonly nameRegex = /^[a-zA-ZáéíóúÁÉÍÓÚñÑ\s]+$/;
@@ -18,27 +22,76 @@ export class ValidatorServices {
   // Regex para contraseña: mínimo 8 caracteres, al menos una mayúscula y un número
   private readonly passwordRegex = /^(?=.*[A-Z])(?=.*\d).{8,}$/;
 
+  // Validador general para login (acepta cualquier dominio institucional)
   institutionalEmail(): ValidatorFn {
     return (control: AbstractControl): ValidationErrors | null => {
       const value = (control.value ?? '').toString().trim();
       if (!value) return null;
-      return this.institutionalEmailRegex.test(value)
-        ? null
-        : { institutionalEmail: true };
+      
+      const isValid = this.studentEmailRegex.test(value) || 
+                      this.teacherEmailRegex.test(value) || 
+                      this.adminEmailRegex.test(value);
+      
+      return isValid ? null : { institutionalEmail: true };
     };
   }
 
+  // NUEVO: Validador que verifica el email según el rol seleccionado
+  emailByRole(roleControl: AbstractControl | null): ValidatorFn {
+    return (emailControl: AbstractControl): ValidationErrors | null => {
+      const email = (emailControl.value ?? '').toString().trim();
+      if (!email) return null;
+
+      const role = roleControl?.value;
+      
+      // Si no hay rol seleccionado, no validar aún
+      if (!role) return null;
+
+      let isValid = false;
+      let expectedDomain = '';
+
+      switch (role) {
+        case 'student':
+          isValid = this.studentEmailRegex.test(email);
+          expectedDomain = this.domains.student;
+          break;
+        case 'teacher':
+          isValid = this.teacherEmailRegex.test(email);
+          expectedDomain = this.domains.teacher;
+          break;
+        case 'admin':
+          isValid = this.adminEmailRegex.test(email);
+          expectedDomain = this.domains.admin;
+          break;
+      }
+
+      if (!isValid) {
+        return { 
+          invalidEmailForRole: {
+            expected: expectedDomain,
+            role: role
+          }
+        };
+      }
+
+      return null;
+    };
+  }
+
+  // Validador para registro (SIN admin) - Lo mantengo por si acaso
   institutionalEmailNoAdmin(): ValidatorFn {
     return (control: AbstractControl): ValidationErrors | null => {
       const value = (control.value ?? '').toString().trim();
       if (!value) return null;
-      return this.institutionalEmailNoAdminRegex.test(value)
-        ? null
-        : { institutionalEmailNoAdmin: true };
+      
+      const isValid = this.studentEmailRegex.test(value) || 
+                      this.teacherEmailRegex.test(value);
+      
+      return isValid ? null : { institutionalEmailNoAdmin: true };
     };
   }
 
-  // Nuevo validador para nombre (solo letras y espacios)
+  // Validador para nombre (solo letras y espacios)
   validName(): ValidatorFn {
     return (control: AbstractControl): ValidationErrors | null => {
       const value = (control.value ?? '').toString().trim();
@@ -49,7 +102,7 @@ export class ValidatorServices {
     };
   }
 
-  // Nuevo validador para contraseña fuerte
+  // Validador para contraseña fuerte
   strongPassword(): ValidatorFn {
     return (control: AbstractControl): ValidationErrors | null => {
       const value = (control.value ?? '').toString();

@@ -64,7 +64,6 @@ export class DashboardScreen {
     this.closeIfMobile();
   }
 
-
   openNewPostModal() {
     const dialogRef = this.dialog.open(NewPostModal, {
       width: '720px',
@@ -93,5 +92,10 @@ export class DashboardScreen {
       .replace(/[\u0300-\u036f]/g, '');
 
     this.router.navigate(['/dashboard/categoria', slug]);
+  }
+
+  logout() {
+    // Aquí puedes limpiar datos de sesión si es necesario
+    this.router.navigate(['/login']);
   }
 }

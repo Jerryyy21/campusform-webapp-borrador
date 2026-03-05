@@ -23,7 +23,7 @@
             <input matInput type="text" placeholder="Juan Hernandez" formControlName="name" />
           </mat-form-field>
           
-          <!-- Mensajes de error personalizados para nombre -->
+          <!-- Mensajes de error para nombre -->
           <div class="error-messages" *ngIf="name?.touched && name?.invalid">
             <div class="error-item" *ngIf="name?.hasError('required')">
               El nombre es requerido
@@ -36,20 +36,22 @@
 
         <!-- Email -->
         <div class="field">
-          <div class="field__label">Correo Institucional</div>
+          <div class="field__label">Correo Electrónico</div>
 
           <mat-form-field appearance="fill" class="full field__control">
             <mat-icon matPrefix>mail</mat-icon>
-            <input matInput type="email" placeholder="ejemplo@alumno.buap.mx" formControlName="email" />
+            <input 
+              matInput 
+              type="email" 
+              [placeholder]="getEmailPlaceholder()" 
+              formControlName="email" 
+            />
           </mat-form-field>
           
-          <!-- Mensajes de error personalizados para email -->
+          <!-- Mensaje de error dinámico para email -->
           <div class="error-messages" *ngIf="email?.touched && email?.invalid">
-            <div class="error-item" *ngIf="email?.hasError('required')">
-              El correo es requerido
-            </div>
-            <div class="error-item" *ngIf="email?.hasError('institutionalEmailNoAdmin')">
-              Debe usar un correo institucional (@alumno.buap.mx o @buap.mx)
+            <div class="error-item">
+              {{ getEmailErrorMessage() }}
             </div>
           </div>
         </div>
@@ -61,6 +63,7 @@
           <mat-radio-group formControlName="role" class="radio">
             <mat-radio-button value="student">Estudiante</mat-radio-button>
             <mat-radio-button value="teacher">Profesor</mat-radio-button>
+            <mat-radio-button value="admin">Administrador</mat-radio-button>
           </mat-radio-group>
         </div>
 
@@ -73,21 +76,10 @@
             <input matInput type="password" placeholder="••••••••" formControlName="password" />
           </mat-form-field>
           
-          <!-- Mensajes de error personalizados para contraseña -->
+          <!-- Mensajes de error para contraseña -->
           <div class="error-messages" *ngIf="password?.touched && password?.invalid">
-            <div class="error-item" *ngIf="password?.hasError('required')">
-              La contraseña es requerida
-            </div>
-            <div class="error-item" *ngIf="password?.hasError('weakPassword')">
-              <div *ngIf="password?.errors?.['weakPassword']?.minLength">
-                • Mínimo 8 caracteres
-              </div>
-              <div *ngIf="password?.errors?.['weakPassword']?.missingUppercase">
-                • Debe tener al menos una mayúscula
-              </div>
-              <div *ngIf="password?.errors?.['weakPassword']?.missingNumber">
-                • Debe tener al menos un número
-              </div>
+            <div class="error-item" *ngFor="let error of getPasswordErrors()">
+              • {{ error }}
             </div>
           </div>
         </div>
@@ -101,7 +93,7 @@
             <input matInput type="password" placeholder="••••••••" formControlName="confirmPassword" />
           </mat-form-field>
           
-          <!-- Mensajes de error personalizados para confirmar contraseña -->
+          <!-- Mensajes de error para confirmar contraseña -->
           <div class="error-messages" *ngIf="confirmPassword?.touched && confirmPassword?.invalid">
             <div class="error-item" *ngIf="confirmPassword?.hasError('required')">
               Confirma tu contraseña

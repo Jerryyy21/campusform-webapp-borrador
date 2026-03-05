@@ -1,5 +1,5 @@
 <div class="landing-root">
-  <!-- Navbar (mismo estilo landing) -->
+  <!-- Navbar -->
   <nav class="navbar navbar-expand-lg navbar-glass sticky-top border-bottom">
     <div class="container py-2 position-relative">
       <a class="navbar-brand d-flex align-items-center gap-2" routerLink="/admin">
@@ -28,35 +28,44 @@
       </div>
     </div>
 
+    <!-- Mensaje de error -->
+    <div class="alert alert-danger" *ngIf="errorMessage">
+      {{ errorMessage }}
+      <button class="btn btn-sm btn-outline-danger ms-3" (click)="loadCategories()">
+        Reintentar
+      </button>
+    </div>
+
     <!-- Crear categoría -->
     <div class="glass-card p-4 mb-4">
       <h2 class="feature-title mb-3">Nueva categoría</h2>
 
       <div class="row g-2 align-items-end">
-        <div class="col-md-3">
+        <div class="col-md-5">
           <label class="form-label small text-muted">Nombre</label>
-          <input class="form-control" [(ngModel)]="newCategory.name" placeholder="Ej: Química" />
+          <input class="form-control" 
+                 [(ngModel)]="newCategory.nombre" 
+                 placeholder="Ej: Química"
+                 [disabled]="loading" />
         </div>
 
         <div class="col-md-5">
           <label class="form-label small text-muted">Descripción</label>
-          <input class="form-control" [(ngModel)]="newCategory.description" placeholder="Ej: Orgánica, inorgánica..." />
-        </div>
-
-        <div class="col-md-2">
-          <label class="form-label small text-muted">Color</label>
-          <select class="form-select" [(ngModel)]="newCategory.colorClass">
-            <option value="dot-blue">Azul</option>
-            <option value="dot-green">Verde</option>
-            <option value="dot-purple">Morado</option>
-            <option value="dot-yellow">Amarillo</option>
-            <option value="dot-red">Rojo</option>
-          </select>
+          <input class="form-control" 
+                 [(ngModel)]="newCategory.descripcion" 
+                 placeholder="Ej: Orgánica, inorgánica..."
+                 [disabled]="loading" />
         </div>
 
         <div class="col-md-2 d-grid">
-          <button class="btn btn-primary" (click)="createCategory()">
-            <i class="bi bi-plus-lg me-2"></i> Crear
+          <button class="btn btn-primary" 
+                  (click)="createCategory()"
+                  [disabled]="loading">
+            <span *ngIf="!loading"><i class="bi bi-plus-lg me-2"></i> Crear</span>
+            <span *ngIf="loading">
+              <span class="spinner-border spinner-border-sm me-2"></span>
+              Creando...
+            </span>
           </button>
         </div>
       </div>
@@ -64,7 +73,16 @@
 
     <!-- Tabla -->
     <div class="glass-card p-3 p-md-4">
-      <div class="table-responsive">
+      <!-- Spinner de carga -->
+      <div class="text-center py-5" *ngIf="loading && categories.length === 0">
+        <div class="spinner-border text-primary mb-3" role="status">
+          <span class="visually-hidden">Cargando...</span>
+        </div>
+        <p class="text-muted">Cargando categorías...</p>
+      </div>
+
+      <!-- Tabla (solo si no está cargando o ya hay datos) -->
+      <div class="table-responsive" *ngIf="!loading || categories.length > 0">
         <table class="table table-wire align-middle mb-0">
           <thead>
             <tr>
@@ -78,67 +96,67 @@
           <tbody>
             <tr *ngFor="let c of filteredCategories">
               <td>
-                <div class="d-flex align-items-center gap-3">
-                  <span class="cat-dot" [class]="(editingId===c.id ? editForm.colorClass : c.colorClass)"></span>
+                <ng-container *ngIf="editingId !== c.id; else editName">
+                  <span class="fw-bold">{{ c.nombre }}</span>
+                </ng-container>
 
-                  <ng-container *ngIf="editingId!==c.id; else editName">
-                    <span class="fw-bold">{{ c.name }}</span>
-                  </ng-container>
-
-                  <ng-template #editName>
-                    <input class="form-control form-control-sm edit-input"
-                           [(ngModel)]="editForm.name" />
-                  </ng-template>
-                </div>
+                <ng-template #editName>
+                  <input class="form-control form-control-sm edit-input"
+                         [(ngModel)]="editForm.nombre"
+                         [disabled]="loading" />
+                </ng-template>
               </td>
 
               <td>
-                <ng-container *ngIf="editingId!==c.id; else editDesc">
-                  <span class="text-muted">{{ c.description }}</span>
+                <ng-container *ngIf="editingId !== c.id; else editDesc">
+                  <span class="text-muted">{{ c.descripcion }}</span>
                 </ng-container>
 
                 <ng-template #editDesc>
                   <input class="form-control form-control-sm edit-input"
-                         [(ngModel)]="editForm.description" />
+                         [(ngModel)]="editForm.descripcion"
+                         [disabled]="loading" />
                 </ng-template>
               </td>
 
               <td class="text-center">
-                <span class="badge badge-soft">{{ c.postCount }}</span>
+                <span class="badge badge-soft">{{ c.post_count }}</span>
               </td>
 
               <td class="text-end">
-                <ng-container *ngIf="editingId!==c.id; else editActions">
-                  <button class="btn btn-link text-decoration-none me-2" (click)="startEdit(c)" title="Editar">
+                <ng-container *ngIf="editingId !== c.id; else editActions">
+                  <button class="btn btn-link text-decoration-none me-2" 
+                          (click)="startEdit(c)" 
+                          title="Editar"
+                          [disabled]="loading">
                     <i class="bi bi-pencil-square"></i>
                   </button>
-                  <button class="btn btn-link text-decoration-none text-danger" (click)="deleteCategory(c)" title="Eliminar">
+                  <button class="btn btn-link text-decoration-none text-danger" 
+                          (click)="deleteCategory(c)" 
+                          title="Eliminar"
+                          [disabled]="loading">
                     <i class="bi bi-trash3"></i>
                   </button>
                 </ng-container>
 
                 <ng-template #editActions>
-                  <select class="form-select form-select-sm d-inline-block me-2 color-select"
-                          [(ngModel)]="editForm.colorClass">
-                    <option value="dot-blue">Azul</option>
-                    <option value="dot-green">Verde</option>
-                    <option value="dot-purple">Morado</option>
-                    <option value="dot-yellow">Amarillo</option>
-                    <option value="dot-red">Rojo</option>
-                  </select>
-
-                  <button class="btn btn-outline-success btn-sm me-2" (click)="saveEdit(c)">
-                    <i class="bi bi-check2"></i> Guardar
+                  <button class="btn btn-outline-success btn-sm me-2" 
+                          (click)="saveEdit(c)"
+                          [disabled]="loading">
+                    <span *ngIf="!loading"><i class="bi bi-check2"></i> Guardar</span>
+                    <span *ngIf="loading" class="spinner-border spinner-border-sm"></span>
                   </button>
 
-                  <button class="btn btn-outline-secondary btn-sm" (click)="cancelEdit()">
+                  <button class="btn btn-outline-secondary btn-sm" 
+                          (click)="cancelEdit()"
+                          [disabled]="loading">
                     Cancelar
                   </button>
                 </ng-template>
               </td>
             </tr>
 
-            <tr *ngIf="filteredCategories.length===0">
+            <tr *ngIf="filteredCategories.length === 0 && !loading">
               <td colspan="4" class="text-center text-muted py-4">
                 No hay categorías con ese filtro.
               </td>

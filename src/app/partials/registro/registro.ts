@@ -1,11 +1,11 @@
-import { Component } from '@angular/core';
+import { Component, OnInit } from '@angular/core';
 import { FormBuilder, Validators, FormGroup } from '@angular/forms';
 import { Router } from '@angular/router';
 import { SHARED_IMPORTS } from '../../shared/shared.imports';
 import { ValidatorServices } from '../../services/tools/validator.services';
 import { AuthService } from '../../services/auth.services';
 
-type Role = 'student' | 'teacher';
+type Role = 'student' | 'teacher' | 'admin';
 
 @Component({
   selector: 'app-registro',
@@ -14,35 +14,73 @@ type Role = 'student' | 'teacher';
   templateUrl: './registro.html',
   styleUrl: './registro.scss',
 })
-export class Registro {
+export class Registro implements OnInit {
   submitting = false;
   form!: FormGroup;
+
+  // Mapa de dominios para mostrar en mensajes de error
+  domainMap = {
+    student: '@alumno.buap.mx',
+    teacher: '@buap.mx',
+    admin: '@admin.buap.mx'
+  };
+
+  // Mapa de nombres de roles en español
+  roleNames = {
+    student: 'estudiante',
+    teacher: 'profesor',
+    admin: 'administrador'
+  };
 
   constructor(
     private fb: FormBuilder,
     private router: Router,
     private validators: ValidatorServices,
     private auth: AuthService
-  ) {
+  ) {}
+
+  ngOnInit() {
     this.form = this.fb.group(
       {
         name: ['', [
           Validators.required,
-          this.validators.validName() // Nuevo validador para nombre
+          this.validators.validName()
         ]],
         email: ['', [
-          Validators.required, 
-          this.validators.institutionalEmailNoAdmin()
+          Validators.required
         ]],
         role: ['student' as Role, [Validators.required]],
         password: ['', [
           Validators.required,
-          this.validators.strongPassword() // Nuevo validador para contraseña
+          this.validators.strongPassword()
         ]],
         confirmPassword: ['', [Validators.required]],
       },
-      { validators: [this.validators.matchFields('password', 'confirmPassword')] }
+      { validators: [
+        this.validators.matchFields('password', 'confirmPassword')
+      ]}
     );
+
+    // Escuchar cambios en el rol para actualizar la validación del email
+    this.form.get('role')?.valueChanges.subscribe(() => {
+      this.form.get('email')?.updateValueAndValidity();
+    });
+
+    // Aplicar validador condicional al email
+    this.setupEmailValidator();
+  }
+
+  setupEmailValidator() {
+    const roleControl = this.form.get('role');
+    const emailControl = this.form.get('email');
+
+    if (emailControl) {
+      emailControl.setValidators([
+        Validators.required,
+        this.validators.emailByRole(roleControl)
+      ]);
+      emailControl.updateValueAndValidity();
+    }
   }
 
   get name() { return this.form.get('name'); }
@@ -51,7 +89,33 @@ export class Registro {
   get password() { return this.form.get('password'); }
   get confirmPassword() { return this.form.get('confirmPassword'); }
 
-  // Método auxiliar para obtener mensajes de error específicos de contraseña
+  // Obtener el placeholder para el email según el rol
+  getEmailPlaceholder(): string {
+    const roleValue = this.role?.value as Role;
+    if (roleValue && this.domainMap[roleValue]) {
+      return `ejemplo${this.domainMap[roleValue]}`;
+    }
+    return 'correo@dominio.com';
+  }
+
+  // Obtener mensaje de error específico para email según el rol
+  getEmailErrorMessage(): string {
+    const emailControl = this.email;
+    const roleValue = this.role?.value as Role;
+
+    if (emailControl?.touched && emailControl?.errors) {
+      if (emailControl.errors['required']) {
+        return 'El correo es requerido';
+      }
+      if (emailControl.errors['invalidEmailForRole'] && roleValue) {
+        const expectedDomain = this.domainMap[roleValue];
+        const roleName = this.roleNames[roleValue];
+        return `Los ${roleName}s deben usar correo ${expectedDomain}`;
+      }
+    }
+    return '';
+  }
+
   getPasswordErrors(): string[] {
     const errors: string[] = [];
     const passwordControl = this.password;
@@ -63,13 +127,13 @@ export class Registro {
       if (passwordControl.errors['weakPassword']) {
         const weakErrors = passwordControl.errors['weakPassword'];
         if (weakErrors['minLength']) {
-          errors.push(`La contraseña debe tener al menos ${weakErrors['minLength'].required} caracteres`);
+          errors.push('Mínimo 8 caracteres');
         }
         if (weakErrors['missingUppercase']) {
-          errors.push('Debe contener al menos una letra mayúscula');
+          errors.push('Debe tener al menos una mayúscula');
         }
         if (weakErrors['missingNumber']) {
-          errors.push('Debe contener al menos un número');
+          errors.push('Debe tener al menos un número');
         }
       }
     }
@@ -91,14 +155,16 @@ export class Registro {
       role: this.form.value.role as Role,
     };
 
+    console.log('Registrando:', payload);
+
     this.auth.register(payload).subscribe({
       next: () => {
         this.submitting = false;
+        // REDIRIGIR A LA PÁGINA DE LOGIN
         this.router.navigate(['/login']);
       },
       error: (err) => {
         this.submitting = false;
-        // aquí puedes mostrar un mat-snack-bar o mat-error global
         console.error('Error register:', err?.error || err);
       }
     });
