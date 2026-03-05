@@ -1,0 +1,284 @@
+<div class="landing-root">
+  <!-- Navbar (mismo estilo) -->
+  <nav class="navbar navbar-expand-lg navbar-glass sticky-top border-bottom">
+    <div class="container py-2 position-relative">
+      <a class="navbar-brand d-flex align-items-center gap-2" routerLink="/">
+        <span class="brand-icon">
+          <i class="bi bi-mortarboard-fill"></i>
+        </span>
+        <span class="brand-name">CampusForum</span>
+      </a>
+
+      <div class="ms-auto d-flex align-items-center gap-2">
+        <span class="badge badge-soft d-none d-md-inline">Admin</span>
+        <button class="btn btn-link text-decoration-none" type="button" title="Settings">
+          <i class="bi bi-gear"></i>
+        </button>
+        <button class="btn btn-link text-decoration-none" type="button" title="Logout">
+          <i class="bi bi-box-arrow-right"></i>
+        </button>
+      </div>
+    </div>
+  </nav>
+
+  <div class="container py-5">
+    <div class="mb-4">
+      <h1 class="section-title display-6 mb-2">Panel de Administración</h1>
+      <p class="section-subtitle mb-0">
+        Administra usuarios, categorías y reportes de la plataforma
+      </p>
+    </div>
+
+    <!-- Tabs glass -->
+    <div class="glass-card tabs-glass p-2 mb-4">
+      <button class="tab-btn" [class.active]="activeTab==='users'" (click)="setTab('users')">
+        Usuarios
+        <span class="tab-pill tab-pill-primary">{{ usersCount }}</span>
+      </button>
+
+      <button class="tab-btn" [class.active]="activeTab==='categories'" (click)="setTab('categories')">
+        Categorías
+        <span class="tab-pill tab-pill-primary">{{ categoriesCount }}</span>
+      </button>
+
+      <button class="tab-btn" [class.active]="activeTab==='reports'" (click)="setTab('reports')">
+        Reportes
+        <span class="tab-pill tab-pill-warn">{{ pendingReportsCount }}</span>
+      </button>
+    </div>
+
+    <!-- USERS -->
+    <div *ngIf="activeTab==='users'" class="glass-card p-4 p-lg-5">
+      <div class="d-flex flex-column flex-lg-row justify-content-between gap-3 mb-4">
+        <div>
+          <h2 class="section-title h4 mb-1">Gestión de Usuarios</h2>
+          <p class="section-subtitle mb-0">Busca, filtra y gestiona roles/estatus</p>
+        </div>
+
+        <div class="d-flex flex-wrap gap-2 align-items-center">
+          <input class="form-control form-control-sm admin-input"
+                 placeholder="Buscar por nombre o email"
+                 [(ngModel)]="userSearch"
+                 />
+
+          <select class="form-select form-select-sm w-auto" [(ngModel)]="roleFilter">
+            <option value="all">Todos los roles</option>
+            <option value="student">Estudiante</option>
+            <option value="professor">Profesor</option>
+            <option value="admin">Admin</option>
+          </select>
+
+          <select class="form-select form-select-sm w-auto" [(ngModel)]="statusFilter">
+            <option value="all">Todos</option>
+            <option value="active">Activos</option>
+            <option value="suspended">Suspendidos</option>
+          </select>
+        </div>
+      </div>
+
+      <div class="table-responsive">
+        <table class="table table-wire align-middle mb-0">
+          <thead>
+            <tr>
+              <th>Usuario</th>
+              <th>Email</th>
+              <th>Rol</th>
+              <th>Estatus</th>
+              <th>Alta</th>
+              <th class="text-end">Acciones</th>
+            </tr>
+          </thead>
+
+          <tbody>
+            <tr *ngFor="let u of filteredUsers">
+              <td class="fw-bold">{{ u.name }}</td>
+              <td class="text-muted">{{ u.email }}</td>
+
+              <td>
+                <select class="form-select form-select-sm w-auto"
+                        [value]="u.role"
+                        (change)="setRole(u, ($any($event.target).value))">
+                  <option value="student">Estudiante</option>
+                  <option value="professor">Profesor</option>
+                  <option value="admin">Admin</option>
+                </select>
+              </td>
+
+              <td>
+                <span class="status-pill"
+                      [class.badge-resolved]="u.status==='active'"
+                      [class.badge-pending]="u.status==='suspended'">
+                  <i class="bi" [class.bi-check-circle]="u.status==='active'" [class.bi-slash-circle]="u.status==='suspended'"></i>
+                  <span class="ms-1">{{ u.status==='active' ? 'Activo' : 'Suspendido' }}</span>
+                </span>
+              </td>
+
+              <td class="text-muted">{{ u.createdAt }}</td>
+
+              <td class="text-end">
+                <button class="btn btn-outline-secondary btn-sm me-2" (click)="toggleSuspend(u)">
+                  <i class="bi" [class.bi-ban]="u.status==='active'" [class.bi-unlock]="u.status==='suspended'"></i>
+                  <span class="ms-1">{{ u.status==='active' ? 'Suspender' : 'Reactivar' }}</span>
+                </button>
+
+                <button class="btn btn-outline-danger btn-sm" (click)="deleteUser(u)">
+                  <i class="bi bi-trash3"></i>
+                  <span class="ms-1">Eliminar</span>
+                </button>
+              </td>
+            </tr>
+
+            <tr *ngIf="filteredUsers.length===0">
+              <td colspan="6" class="text-center text-muted py-4">
+                No hay usuarios con esos filtros.
+              </td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+
+    <!-- CATEGORIES -->
+    <div *ngIf="activeTab==='categories'" class="glass-card p-4 p-lg-5">
+      <div class="d-flex flex-column flex-lg-row justify-content-between gap-3 mb-4">
+        <div>
+          <h2 class="section-title h4 mb-1">Categorías</h2>
+          <p class="section-subtitle mb-0">Crea y elimina categorías</p>
+        </div>
+      </div>
+
+      <!-- Create category -->
+      <div class="glass-card p-3 p-md-4 mb-4">
+        <div class="row g-2 align-items-end">
+          <div class="col-md-3">
+            <label class="form-label small text-muted">Nombre</label>
+            <input class="form-control" [(ngModel)]="newCategory.name" placeholder="Ej: Química" />
+          </div>
+
+          <div class="col-md-5">
+            <label class="form-label small text-muted">Descripción</label>
+            <input class="form-control" [(ngModel)]="newCategory.description" placeholder="Ej: Orgánica, inorgánica..." />
+          </div>
+
+          <div class="col-md-2">
+            <label class="form-label small text-muted">Color</label>
+            <select class="form-select" [(ngModel)]="newCategory.colorClass">
+              <option value="dot-blue">Azul</option>
+              <option value="dot-green">Verde</option>
+              <option value="dot-purple">Morado</option>
+              <option value="dot-yellow">Amarillo</option>
+              <option value="dot-red">Rojo</option>
+            </select>
+          </div>
+
+          <div class="col-md-2 d-grid">
+            <button class="btn btn-primary" (click)="addCategory()">
+              <i class="bi bi-plus-lg me-2"></i> Crear
+            </button>
+          </div>
+        </div>
+      </div>
+
+      <!-- List categories -->
+      <div class="table-responsive">
+        <table class="table table-wire align-middle mb-0">
+          <thead>
+            <tr>
+              <th>Categoría</th>
+              <th>Descripción</th>
+              <th class="text-center">Publicaciones</th>
+              <th class="text-end">Acciones</th>
+            </tr>
+          </thead>
+
+          <tbody>
+            <tr *ngFor="let c of categories">
+              <td>
+                <div class="d-flex align-items-center gap-3">
+                  <span class="cat-dot" [class]="c.colorClass"></span>
+                  <span class="fw-bold">{{ c.name }}</span>
+                </div>
+              </td>
+
+              <td class="text-muted">{{ c.description }}</td>
+
+              <td class="text-center">
+                <span class="badge badge-soft">{{ c.postCount }}</span>
+              </td>
+
+              <td class="text-end">
+                <button class="btn btn-outline-danger btn-sm" (click)="deleteCategory(c)">
+                  <i class="bi bi-trash3"></i>
+                  <span class="ms-1">Eliminar</span>
+                </button>
+              </td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+
+    <!-- REPORTS -->
+    <div *ngIf="activeTab==='reports'" class="glass-card p-4 p-lg-5">
+      <h2 class="section-title h4 mb-4">Reportes y Moderación</h2>
+
+      <div class="d-grid gap-3">
+        <div class="glass-card p-4 hover-lift" *ngFor="let r of reports">
+          <div class="d-flex flex-column flex-lg-row gap-3 justify-content-between">
+            <div class="flex-grow-1">
+              <div class="d-flex flex-wrap gap-2 mb-2">
+                <span class="badge badge-outline">{{ reportTypeLabel(r.type) }}</span>
+
+                <span class="status-pill" [class]="statusClass(r.status)">
+                  <i class="bi"
+                    [class.bi-clock]="r.status==='pending'"
+                    [class.bi-check-circle]="r.status==='resolved'"
+                    [class.bi-x-circle]="r.status==='dismissed'"></i>
+                  <span class="ms-1">{{ statusLabel(r.status) }}</span>
+                </span>
+
+                <span *ngIf="r.reportedUser" class="badge badge-soft">
+                  Reportado: {{ r.reportedUser }}
+                </span>
+              </div>
+
+              <h3 class="h5 fw-bold mb-2">{{ r.contentTitle }}</h3>
+
+              <div class="text-muted small d-flex flex-wrap gap-2 align-items-center mb-2">
+                <span>Reportado por: {{ r.reporter }}</span>
+                <span class="dot">•</span>
+                <span>{{ r.date }}</span>
+              </div>
+
+              <div class="text-muted">
+                <b class="text-dark">Razón:</b> {{ r.reason }}
+              </div>
+            </div>
+
+            <div class="d-flex gap-2 align-items-start justify-content-end flex-wrap">
+              <button class="btn btn-outline-primary btn-sm">
+                <i class="bi bi-eye me-1"></i> Ver
+              </button>
+
+              <ng-container *ngIf="r.status==='pending'">
+                <button class="btn btn-outline-success btn-sm" (click)="reportAction(r.id,'resolve')">
+                  <i class="bi bi-check2-circle me-1"></i> Resolver
+                </button>
+                <button class="btn btn-outline-secondary btn-sm" (click)="reportAction(r.id,'dismiss')">
+                  Desestimar
+                </button>
+              </ng-container>
+
+              <ng-container *ngIf="r.status!=='pending'">
+                <button class="btn btn-outline-primary btn-sm">
+                  <i class="bi bi-info-circle me-1"></i> Detalles
+                </button>
+              </ng-container>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+  </div>
+</div>
