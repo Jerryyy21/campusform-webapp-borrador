@@ -1,11 +1,11 @@
 import { Component } from '@angular/core';
+import { CategoriasScreen } from '../categorias-screen/categorias-screen';
 
 @Component({
   selector: 'app-matematicas',
-  imports: [],
+  standalone: true,
+  imports: [CategoriasScreen],
   templateUrl: './matematicas.html',
   styleUrl: './matematicas.scss',
 })
-export class Matematicas {
-
-}
+export class MatematicasComponent {}

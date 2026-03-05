@@ -1,11 +1,11 @@
 import { Component } from '@angular/core';
+import { CategoriasScreen } from '../categorias-screen/categorias-screen';
 
 @Component({
   selector: 'app-ingles',
-  imports: [],
+  standalone: true,
+  imports: [CategoriasScreen],
   templateUrl: './ingles.html',
   styleUrl: './ingles.scss',
 })
-export class Ingles {
-
-}
+export class InglesComponent {}

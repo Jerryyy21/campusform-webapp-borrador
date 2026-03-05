@@ -3,6 +3,7 @@ import { SHARED_IMPORTS } from '../../shared/shared.imports';
 import { MatDialog } from '@angular/material/dialog';
 import { MatSidenav } from '@angular/material/sidenav';
 import { NewPostModal } from '../../partials/new-post-modal/new-post-modal';
+import { Router } from '@angular/router';
 
 @Component({
   selector: 'app-dashboard-screen',
@@ -27,7 +28,7 @@ export class DashboardScreen {
 
   isMobile = window.innerWidth <= 768;
 
-  constructor(private dialog: MatDialog) {}
+  constructor(private dialog: MatDialog, private router: Router) {}
 
   @HostListener('window:resize')
   onResize() {
@@ -75,5 +76,22 @@ export class DashboardScreen {
     dialogRef.afterClosed().subscribe((result) => {
       console.log('Modal result:', result);
     });
+  }
+
+  goToCategory(label: string) {
+    this.activeCategory = label;
+    this.closeIfMobile();
+
+    if (label === 'Todas') {
+      this.router.navigate(['/dashboard']);
+      return;
+    }
+
+    const slug = label
+      .toLowerCase()
+      .normalize('NFD')
+      .replace(/[\u0300-\u036f]/g, '');
+
+    this.router.navigate(['/dashboard/categoria', slug]);
   }
 }
