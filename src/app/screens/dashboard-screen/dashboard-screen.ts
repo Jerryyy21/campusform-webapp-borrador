@@ -94,6 +94,31 @@ export class DashboardScreen {
     this.router.navigate(['/dashboard/categoria', slug]);
   }
 
+  //para dashboard-secciones
+  goToSection(label: string) {
+    this.activeSection = label;
+    this.closeIfMobile();
+
+    // ruta base: dashboard
+    if (label === 'Inicio') {
+      this.router.navigate(['/dashboard']);
+      return;
+    }
+
+    // slugs exactos según tus rutas
+    const routesMap: Record<string, string> = {
+      'Mis Posts': 'mis-posts',
+      'Populares': 'populares',
+      'Guardados': 'guardados',
+    };
+
+    const slug = routesMap[label];
+
+    if (!slug) return;
+
+    this.router.navigate(['/dashboard', slug]);
+  }
+
   logout() {
     // Aquí puedes limpiar datos de sesión si es necesario
     this.router.navigate(['/login']);

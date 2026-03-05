@@ -1,0 +1,126 @@
+.page-wrap {
+  max-width: 1040px;
+  margin: 0 auto;
+}
+
+.breadcrumb {
+  color: #6c757d;
+  font-size: 16px;
+  margin-bottom: 18px;
+}
+
+.dot {
+  margin: 0 0.35rem;
+  opacity: 0.7;
+}
+
+/* Header */
+.content-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+  margin-bottom: 18px;
+  flex-wrap: wrap;
+}
+
+.content-title {
+  min-width: 260px;
+}
+
+.section-title {
+  font-weight: 900;
+  color: #0b2f5b;
+  letter-spacing: -0.02em;
+  font-size: 44px;
+  margin: 0;
+  line-height: 1.05;
+}
+
+.section-subtitle {
+  margin: 6px 0 0;
+  color: #6c757d;
+}
+
+.new-post-btn {
+  display: inline-flex !important;
+  transition: transform 200ms ease, box-shadow 200ms ease;
+}
+
+.new-post-btn:hover {
+  transform: scale(1.12);
+  box-shadow: 0 18px 40px rgba(0, 0, 0, 0.15);
+}
+
+/* Glass cards */
+.glass-card {
+  background: rgba(255, 255, 255, 0.92);
+  border: 1px solid rgba(15, 23, 42, 0.08);
+  border-radius: 26px;
+  box-shadow: 0 22px 60px rgba(2, 6, 23, 0.10);
+  backdrop-filter: blur(10px);
+}
+
+/* Search + sort */
+.search-card {
+  padding: 22px;
+  margin-bottom: 26px;
+}
+
+.search-row {
+  display: flex;
+  gap: 16px;
+  align-items: center;
+  flex-wrap: wrap;
+}
+
+.search-field {
+  flex: 1 1 520px;
+}
+
+.sort-field {
+  width: 240px;
+}
+
+:host { display: block; }
+
+/* Igual que dashboard */
+.page-wrap {
+  max-width: 1040px;
+  margin: 0 auto;
+  padding: 22px 26px;
+}
+
+/* Breadcrumb bonito */
+.breadcrumb {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  color: #6c757d;
+  font-size: 14px;
+  margin-bottom: 16px;
+}
+
+.dot {
+  margin: 0 4px;
+  opacity: 0.7;
+}
+
+/* Botón Dashboard como texto*/
+.breadcrumb-link {
+  padding: 0 !important;
+  min-width: auto !important;
+  line-height: 1 !important;
+
+  font-weight: 600;
+  color: #0b2f5b !important;   /* mismo azul del título */
+  text-transform: none !important;
+}
+
+.breadcrumb-link:hover {
+  text-decoration: underline;
+  background: transparent !important;
+}
+.empty-card .empty-title{
+  font-size: 20px !important;
+}

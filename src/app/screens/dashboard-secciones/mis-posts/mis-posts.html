@@ -1,0 +1,50 @@
+<div class="page-wrap">
+  <!-- BREADCRUMB -->
+  <div class="breadcrumb">
+    Inicio <span class="dot">›</span>
+
+    <button mat-button class="breadcrumb-link" (click)="goBackDashboard()">
+      Dashboard
+    </button>
+
+    <span class="dot">›</span>
+    Mis Posts
+  </div>
+
+  <!-- HEADER -->
+  <div class="content-header">
+    <div class="content-title">
+      <h1 class="section-title">Mis Publicaciones</h1>
+      <p class="section-subtitle">0 publicaciones encontradas</p>
+    </div>
+
+    <button mat-flat-button color="primary" class="new-post-btn">
+      Nueva publicación
+    </button>
+  </div>
+
+  <!-- SEARCH + ORDER -->
+  <div class="glass-card search-card">
+    <div class="search-row">
+      <mat-form-field appearance="outline" class="search-field">
+        <mat-label>Buscar en mis publicaciones...</mat-label>
+        <mat-icon matPrefix>search</mat-icon>
+        <input matInput [(ngModel)]="searchQuery" />
+      </mat-form-field>
+
+      <mat-form-field appearance="outline" class="sort-field">
+        <mat-label>Ordenar por</mat-label>
+        <mat-select [(ngModel)]="sortBy">
+          <mat-option value="recent">Más recientes</mat-option>
+          <mat-option value="popular">Más populares</mat-option>
+          <mat-option value="comments">Más comentados</mat-option>
+        </mat-select>
+      </mat-form-field>
+    </div>
+  </div>
+
+  <!-- EMPTY STATE -->
+  <div class="glass-card empty-state empty-card">
+    <h3 class="empty-title">Aún no has creado publicaciones</h3>
+  </div>
+</div>

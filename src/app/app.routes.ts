@@ -16,6 +16,9 @@ import { FisicaComponent } from './screens/categorias/fisica/fisica';
 import { InglesComponent } from './screens/categorias/ingles/ingles';
 import { MatematicasComponent } from './screens/categorias/matematicas/matematicas';
 import { ProgramacionComponent } from './screens/categorias/programacion/programacion';
+import { GuardadosComponent } from './screens/dashboard-secciones/guardados/guardados';
+import { MisPostsComponent } from './screens/dashboard-secciones/mis-posts/mis-posts';
+import { PopularesComponent } from './screens/dashboard-secciones/populares/populares';
 
 export const routes: Routes = [
 
@@ -34,6 +37,10 @@ export const routes: Routes = [
   { path: 'dashboard/categoria/ingles', component: InglesComponent },
   { path: 'dashboard/categoria/matematicas', component: MatematicasComponent },
   { path: 'dashboard/categoria/programacion', component: ProgramacionComponent },
+
+  { path: 'dashboard/mis-posts', component: MisPostsComponent },
+  { path: 'dashboard/populares', component: PopularesComponent },
+  { path: 'dashboard/guardados', component: GuardadosComponent },
 
 
 

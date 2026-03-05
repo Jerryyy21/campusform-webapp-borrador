@@ -38,46 +38,35 @@
       class="sidebar"
       [mode]="isMobile ? 'over' : 'side'"
       [opened]="!isMobile"
-    >
-      <button
-        mat-button
-        class="nav-btn"
-        [class.active]="activeSection === 'Inicio'"
-        (click)="setSection('Inicio')"
       >
+      <button mat-button class="nav-btn"
+        [class.active]="activeSection === 'Inicio'"
+        (click)="goToSection('Inicio')">
         <mat-icon>home</mat-icon>
         Inicio
       </button>
 
-      <button
-        mat-button
-        class="nav-btn"
+      <button mat-button class="nav-btn"
         [class.active]="activeSection === 'Mis Posts'"
-        (click)="setSection('Mis Posts')"
-      >
+        (click)="goToSection('Mis Posts')">
         <mat-icon>chat</mat-icon>
         Mis Posts
       </button>
 
-      <button
-        mat-button
-        class="nav-btn"
+      <button mat-button class="nav-btn"
         [class.active]="activeSection === 'Populares'"
-        (click)="setSection('Populares')"
-      >
+        (click)="goToSection('Populares')">
         <mat-icon>trending_up</mat-icon>
         Populares
       </button>
 
-      <button
-        mat-button
-        class="nav-btn"
+      <button mat-button class="nav-btn"
         [class.active]="activeSection === 'Guardados'"
-        (click)="setSection('Guardados')"
-      >
+        (click)="goToSection('Guardados')">
         <mat-icon>bookmark</mat-icon>
         Guardados
       </button>
+
 
       <!-- CATEGORÍAS -->
       <div class="sidebar-cats">

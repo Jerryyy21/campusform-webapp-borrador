@@ -1,0 +1,37 @@
+<div class="page-wrap">
+  <!-- BREADCRUMB -->
+  <div class="breadcrumb">
+    Inicio <span class="dot">›</span>
+
+    <button mat-button class="breadcrumb-link" (click)="goBackDashboard()">
+      Dashboard
+    </button>
+
+    <span class="dot">›</span>
+    Guardados
+  </div>
+
+  <!-- HEADER -->
+  <div class="content-header">
+    <div class="content-title">
+      <h1 class="section-title">Publicaciones Guardadas</h1>
+      <p class="section-subtitle">0 publicaciones guardadas</p>
+    </div>
+  </div>
+
+  <!-- SEARCH -->
+  <div class="glass-card search-card">
+    <div class="search-row">
+      <mat-form-field appearance="outline" class="search-field">
+        <mat-label>Buscar en guardados...</mat-label>
+        <mat-icon matPrefix>search</mat-icon>
+        <input matInput [(ngModel)]="searchQuery" />
+      </mat-form-field>
+    </div>
+  </div>
+
+  <!-- EMPTY STATE -->
+  <div class="glass-card empty-state empty-card">
+    <h3 class="empty-title">Aún no tienes publicaciones guardadas</h3>
+  </div>
+</div>
