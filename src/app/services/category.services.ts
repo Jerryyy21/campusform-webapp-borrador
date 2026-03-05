@@ -24,7 +24,7 @@ export interface CreateCategoryPayload {
   providedIn: 'root'
 })
 export class CategoryService {
-  // ✅ TU BACKEND REAL ES /api/...
+  //  TU BACKEND REAL ES /api/...
   private apiUrl = 'http://localhost:8000/api';
 
   constructor(
@@ -54,7 +54,7 @@ export class CategoryService {
 
     return this.http.get<Category[]>(url).pipe(
       catchError(error => {
-        console.error('❌ Error en getCategories:', error);
+        console.error(' Error en getCategories:', error);
         return throwError(() => error);
       })
     );
@@ -63,11 +63,11 @@ export class CategoryService {
   /** Obtiene una categoría por ID - PÚBLICO */
   getCategory(id: number): Observable<Category> {
     const url = `${this.apiUrl}/categorias/${id}/`;
-    console.log('📡 GET categoría:', url);
+    console.log(' GET categoría:', url);
 
     return this.http.get<Category>(url).pipe(
       catchError(error => {
-        console.error('❌ Error en getCategory:', error);
+        console.error(' Error en getCategory:', error);
         return throwError(() => error);
       })
     );
@@ -80,7 +80,7 @@ export class CategoryService {
 
     const token = this.auth.getToken();
     if (!token) {
-      console.error('❌ No hay token en localStorage/sessionStorage');
+      console.error(' No hay token en localStorage/sessionStorage');
       return throwError(() => new Error('No hay token de autenticación'));
     }
 
@@ -95,7 +95,7 @@ export class CategoryService {
   /** Actualiza una categoría - REQUIERE TOKEN */
   updateCategory(id: number, payload: CreateCategoryPayload): Observable<Category> {
     const url = `${this.apiUrl}/categorias/${id}/`;
-    console.log('📡 PUT actualizar categoría:', url);
+    console.log(' PUT actualizar categoría:', url);
 
     const token = this.auth.getToken();
     if (!token) {
@@ -104,7 +104,7 @@ export class CategoryService {
 
     return this.http.put<Category>(url, payload, { headers: this.authHeaders() }).pipe(
       catchError(error => {
-        console.error('❌ Error en updateCategory:', error);
+        console.error(' Error en updateCategory:', error);
         return throwError(() => error);
       })
     );
@@ -122,7 +122,7 @@ export class CategoryService {
 
     return this.http.delete<void>(url, { headers: this.authHeaders() }).pipe(
       catchError(error => {
-        console.error('❌ Error en deleteCategory:', error);
+        console.error(' Error en deleteCategory:', error);
         return throwError(() => error);
       })
     );
